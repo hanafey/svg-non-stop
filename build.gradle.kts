@@ -1,13 +1,14 @@
 plugins {
-    kotlin("jvm") version "1.3.61"
+    kotlin("jvm") version "1.6.0"
+    java
     application
 }
 
-group = ""
-version = "1.1.0"
+group = "com.hanafey.svg-non-stop"
+version = "1.0"
 
 application {
-    mainClassName = "NonStopKt"
+    mainClass.set("com.hanafey.svgnonstop.NonStop")
 }
 
 repositories {
@@ -15,14 +16,11 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("stdlib"))
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
 }
 
-tasks {
-    compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
-    }
-    compileTestKotlin {
-        kotlinOptions.jvmTarget = "1.8"
-    }
+tasks.getByName<Test>("test") {
+    useJUnitPlatform()
 }

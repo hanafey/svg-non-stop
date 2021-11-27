@@ -1,3 +1,9 @@
+/**
+ * Copied from https://github.com/14v/svg-non-stop. Imported into a new Intellij IDEA project, and
+ * made the layout more conventional.
+ */
+package com.hanafey.svgnonstop
+
 import org.w3c.dom.NamedNodeMap
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
@@ -137,56 +143,56 @@ object NonStop {
     private fun logv(message: String) {
         if (optionVerbose) println(message)
     }
-}
 
-
-fun main(args: Array<String>) {
-    var filename: String? = null
-    var optionForceOverwrite = false
-    args.forEach {
-        when (it) {
-            "-f" -> {
-                optionForceOverwrite = true
-                println("Option Force overwrite is on.")
+    @JvmStatic
+    fun main(args: Array<String>) {
+        var filename: String? = null
+        var optionForceOverwrite = false
+        args.forEach {
+            when (it) {
+                "-f" -> {
+                    optionForceOverwrite = true
+                    println("Option Force overwrite is on.")
+                }
+                "-v" -> {
+                    NonStop.optionVerbose = true
+                    println("Option Verbose is on.")
+                }
+                else -> filename = it
             }
-            "-v" -> {
-                NonStop.optionVerbose = true
-                println("Option Verbose is on.")
-            }
-            else -> filename = it
         }
+        if (filename == null) {
+            println("Pass target SVG file name as parameter.\n" +
+                    "Add -f to force overwrite target _nonstop.svg file, -v to have verbose output.")
+            return
+        }
+
+        val documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+        val document = documentBuilder.parse(filename)
+        val documentURI = document.documentURI
+
+        val nonstopDocumentURI = documentURI.replace(".svg", "_nonstop.svg")
+        val nonstopFile = File(URI.create(nonstopDocumentURI))
+        if (nonstopFile.exists() && !optionForceOverwrite) {
+            println("Target file ${nonstopFile.name} already exists, exiting. Use -f option to force overwrite.")
+            return
+        }
+
+        println("Parsed file $documentURI")
+        val nodes = document.documentElement.childNodes
+        println("Document contains ${nodes.length} nodes.")
+
+        val resultOk = NonStop.processSvg(nodes)
+
+        if (!resultOk) {
+            println("Errors occurred, exiting.")
+            return
+        }
+
+        println("Processed document.")
+        val domSource = DOMSource(document)
+        val streamResult = StreamResult(nonstopFile)
+        TransformerFactory.newInstance().newTransformer().transform(domSource, streamResult)
+        println("Saved new file $nonstopDocumentURI successfully.")
     }
-    if (filename == null) {
-        println("Pass target SVG file name as parameter.\n" +
-                "Add -f to force overwrite target _nonstop.svg file, -v to have verbose output.")
-        return
-    }
-
-    val documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-    val document = documentBuilder.parse(filename)
-    val documentURI = document.documentURI
-
-    val nonstopDocumentURI = documentURI.replace(".svg", "_nonstop.svg")
-    val nonstopFile = File(URI.create(nonstopDocumentURI))
-    if (nonstopFile.exists() && !optionForceOverwrite) {
-        println("Target file ${nonstopFile.name} already exists, exiting. Use -f option to force overwrite.")
-        return
-    }
-
-    println("Parsed file $documentURI")
-    val nodes = document.documentElement.childNodes
-    println("Document contains ${nodes.length} nodes.")
-
-    val resultOk = NonStop.processSvg(nodes)
-
-    if (!resultOk) {
-        println("Errors occurred, exiting.")
-        return
-    }
-
-    println("Processed document.")
-    val domSource = DOMSource(document)
-    val streamResult = StreamResult(nonstopFile)
-    TransformerFactory.newInstance().newTransformer().transform(domSource, streamResult)
-    println("Saved new file $nonstopDocumentURI successfully.")
 }
