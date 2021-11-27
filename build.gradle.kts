@@ -1,8 +1,9 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 plugins {
     kotlin("jvm") version "1.6.0"
     java
     application
-}
+    id("com.github.johnrengelman.shadow") version "7.1.0"}
 
 group = "com.hanafey.svg-non-stop"
 version = "1.0"
@@ -23,4 +24,13 @@ dependencies {
 
 tasks.getByName<Test>("test") {
     useJUnitPlatform()
+}
+
+tasks {
+    named<ShadowJar>("shadowJar") {
+        archiveBaseName.set("nonstop")
+        archiveClassifier.set("")
+        archiveVersion.set("")
+        // mergeServiceFiles()
+    }
 }
