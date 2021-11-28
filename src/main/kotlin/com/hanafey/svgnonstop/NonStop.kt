@@ -148,6 +148,7 @@ object NonStop {
     fun main(args: Array<String>) {
         var filename: String? = null
         var optionForceOverwrite = false
+        var suffix = "_nonstop"
         args.forEach {
             when (it) {
                 "-f" -> {
@@ -158,12 +159,16 @@ object NonStop {
                     NonStop.optionVerbose = true
                     println("Option Verbose is on.")
                 }
+                "-s" -> {
+                    // Use the For Vector Drawable convention.
+                    suffix = "_4VD"
+                }
                 else -> filename = it
             }
         }
         if (filename == null) {
             println("Pass target SVG file name as parameter.\n" +
-                    "Add -f to force overwrite target _nonstop.svg file, -v to have verbose output.")
+                    "Add -f to force overwrite target $suffix.svg file, -v to have verbose output.")
             return
         }
 
@@ -171,7 +176,7 @@ object NonStop {
         val document = documentBuilder.parse(filename)
         val documentURI = document.documentURI
 
-        val nonstopDocumentURI = documentURI.replace(".svg", "_nonstop.svg")
+        val nonstopDocumentURI = documentURI.replace(".svg", "$suffix.svg")
         val nonstopFile = File(URI.create(nonstopDocumentURI))
         if (nonstopFile.exists() && !optionForceOverwrite) {
             println("Target file ${nonstopFile.name} already exists, exiting. Use -f option to force overwrite.")
